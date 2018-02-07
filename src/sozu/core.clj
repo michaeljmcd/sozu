@@ -1,7 +1,15 @@
 (ns sozu.core
   (:require [clojure.data.csv :as csv]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [instaparse.core :as insta])
   (:gen-class))
+
+(def sozu-parser (insta/parser 
+                      "cell = value | formula
+                       value = number
+                       number = '1' | '2'
+                       formula = '=' number
+                       "))
 
 ; TODO: dispose of readers & writers
 (defn- load-sozu-file [path]
