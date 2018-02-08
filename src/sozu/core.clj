@@ -16,10 +16,13 @@
 
 (def cell-parser (comp first sozu-parser))
 
+(defn- string->number [str]
+     (Integer. str))
+
 (defn- evaluate-cell [cell]
  (case (-> cell second first)
   :string (-> cell second second)
-  :number (-> cell second second Integer.)
+  :number (-> cell second second string->number)
  )
 )
 
