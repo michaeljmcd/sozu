@@ -17,7 +17,10 @@
 (def cell-parser (comp first sozu-parser))
 
 (defn- evaluate-cell [cell]
- cell
+ (case (-> cell second first)
+  :string (-> cell second second)
+  :number (-> cell second second Integer.)
+ )
 )
 
 (defn- evaluate-sheet [sheet]
