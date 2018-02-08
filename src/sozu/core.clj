@@ -5,20 +5,38 @@
   (:gen-class))
 
 (def sozu-parser (insta/parser 
-                      "cell = value | formula
-                       value = number
-                       number = '1' | '2'
-                       formula = '=' number
+                      "<cell> = value | formula
+                       value = date | number | string
+                       date = optionalWhitespace #'\\d{4}-\\d{2}-\\d{2}' optionalWhitespace
+                       number = #'\\d+'
+                       formula = <'='> optionalWhitespace number optionalWhitespace
+                       <optionalWhitespace> =  <#'\\s*'>
+                       string = #'.*'
                        "))
 
-; TODO: dispose of readers & writers
+(def cell-parser (comp first sozu-parser))
+
+(defn- evaluate-cell [cell]
+ cell
+)
+
+(defn- evaluate-sheet [sheet]
+ (map #(map evaluate-cell %) sheet)
+    )
+
+(defn- calculate-sheet-dependencies [sheet]
+ nil)
+
+(defn- read-csv-file [path]
+ (with-open [reader (io/reader path)] 
+                   (doall (csv/read-csv reader))))
+
 (defn- load-sozu-file [path]
- (let [parsed (with-open [reader (io/reader path)] 
-                   (doall (csv/read-csv reader))) ]
+ (let [sheet (map #(map cell-parser %) (read-csv-file path))]
  {
-     :values parsed
-     :display parsed
-     :dependencies nil
+     :values sheet
+     :display (evaluate-sheet sheet)
+     :dependencies (calculate-sheet-dependencies sheet)
  }
  )
 )
